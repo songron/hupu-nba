@@ -16,6 +16,7 @@ class Board(object):
         curses.cbreak()
         curses.curs_set(0)
         self.screen.keypad(1)
+        self.screen.nodelay(1)
         curses.start_color()
         self.screen.refresh()
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -41,13 +42,20 @@ class Board(object):
                     break
                 self.cache_lines.append(msg)
 
+    def draw_status(self, status):
+        self.screen.addstr(0, 2, '%s' % (status, ), curses.color_pair(1))
+        self.screen.refresh()
+
     def draw_menu(self, menus):
         self.screen.erase()
-        x, y = 1, 1
-        for _datetime, _teams, _info in menus:
-            self.screen.addstr(x, y, _datetime, curses.color_pair(1))
-            self.screen.addstr(x, y+15, _datetime, curses.color_pair(1))
-            self.screen.addstr(x, y+24, _datetime, curses.color_pair(1))
+        self.screen.addstr(1, 25, '近期比赛', curses.color_pair(2))
+        x, y = 3, 2
+        for i, (_datetime, _teams, _info) in enumerate(menus):
+            self.screen.addstr(x, y, '[%d]' % (i+1,), curses.color_pair(1))
+            self.screen.addstr(x, y+5, _datetime, curses.color_pair(1))
+            self.screen.addstr(x, y+30, _teams, curses.color_pair(1))
+            self.screen.addstr(x, y+50, _info, curses.color_pair(1))
+            x += 2
         self.screen.refresh()
 
     def draw_header(self):
@@ -64,7 +72,7 @@ class Board(object):
             return
         self.update_cache(lines)
 
-        self.erase()
+        self.screen.erase()
         self.draw_header()
         x, y = 3, 2
         for sid, residual, scores, team, content in self.cache_lines:

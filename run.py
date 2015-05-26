@@ -5,27 +5,19 @@
 import time
 from board import Board
 from hupuapi import APIClient
-
-
-def nba_live(b, api):
-    while True:
-        key = b.screen.getch()
-        if key == ord('q'):
-            break
-        if key == ord('f'):
-            lines = api.get_messages()
-            b.update(lines)
+from controls import Controller
 
 
 def main():
-    b = Board()
+    brd = Board()
     api = APIClient()
+    ctr = Controller(brd, api)
     try:
-        nba_live(b, api)
+        ctr.start()
     except Exception as e:
         pass
     finally:
-        b.exit()
+        brd.exit()
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ class APIClient(object):
         self.home_team = '火箭'
         self.away_team = '勇士'
 
-    def get_menu(self):
+    def get_menus(self):
         try:
             text = urllib2.urlopen(self.menu_url).read()
             text = text.decode('utf8', 'ignore')
@@ -26,22 +26,22 @@ class APIClient(object):
         except Exception as e:
             return []
 
-        match_list = tree.xpath('//div[@class="match-list"]')
+        match_list = tree.xpath('//div[@class="match-list"]/dl')
         menu_list = []
 
         for match in match_list:
-            date_span = match.xpath('./dl/dt/span[@class="date"]')
+            date_span = match.xpath('./dt/span[@class="date"]')
             _date = date_span[0].text_content() if date_span else ''
-            day_span = match.xpath('./dl/dt/span[@class="day"]')
+            day_span = match.xpath('./dt/span[@class="day"]')
             _day = day_span[0].text_content() if day_span else ''
 
-            info_spans = match.xpath('./dl/dd/span')
-            _time = info_spans[0].text_content()
-            _teams = info_spans[1].text_content()
-            _info = info_spans[2].text_content()
+            info_spans = match.xpath('./dd/span')
+            _time = info_spans[0].text_content().strip()
+            _teams = info_spans[1].text_content().strip()
+            _info = info_spans[2].text_content().strip()
 
             _datetime = '%s %s %s' % (_date, _day, _time)
-            menu = (_datetime, _teams, _info)
+            menu = (_datetime.encode('utf8'), _teams.encode('utf8'), _info.encode('utf8'))
             menu_list.append(menu)
 
         return menu_list
@@ -89,7 +89,6 @@ class APIClient(object):
             text = r.read().decode('utf8', 'ignore')
             msg_list = self.decode_messages(text)
         except Exception as e:
-            print e
             return []
 
         if msg_list:
@@ -100,8 +99,9 @@ class APIClient(object):
 if __name__ == '__main__':
     api = APIClient()
     msgs = api.get_messages()
-    for msg in msgs:
-        print msg
+    #for msg in msgs:
+    #    print msg
 
-    menus = api.get_menu()
-    print menus
+    menus = api.get_menus()
+    for a, b, c in menus:
+        print a, b, c
