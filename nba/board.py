@@ -25,6 +25,9 @@ class Board(object):
         self.cache_size = 10
         self.cache_lines = []
 
+    def init_match(self):
+        self.cache_lines = []
+
     def update_cache(self, lines):
         if not self.cache_lines:
             self.cache_lines = lines[:self.cache_size]
@@ -43,14 +46,14 @@ class Board(object):
                 self.cache_lines.append(msg)
 
     def draw_status(self, status):
-        self.screen.addstr(0, 2, '%s' % (status, ), curses.color_pair(1))
+        self.screen.addstr(0, 2, status, curses.color_pair(1))
         self.screen.refresh()
 
     def draw_menu(self, menus):
         self.screen.erase()
         self.screen.addstr(1, 25, '近期比赛', curses.color_pair(2))
         x, y = 3, 2
-        for i, (_datetime, _teams, _info) in enumerate(menus):
+        for i, (_match_id, _datetime, _teams, _info) in enumerate(menus):
             self.screen.addstr(x, y, '[%d]' % (i+1,), curses.color_pair(1))
             self.screen.addstr(x, y+5, _datetime, curses.color_pair(1))
             self.screen.addstr(x, y+30, _teams, curses.color_pair(1))
@@ -58,23 +61,32 @@ class Board(object):
             x += 2
         self.screen.refresh()
 
-    def draw_header(self):
-        x, y = 1, 1
+    def draw_header(self, home, away):
+        teamstr = '主队: %s    客队: %s' % (home, away)
+        self.screen.addstr(0, 5, teamstr, curses.color_pair(2))
+        x, y = 2, 1
         self.screen.addstr(x, y, '本节剩余', curses.color_pair(2))
         self.screen.addstr(x, y+9, '当前比分', curses.color_pair(2))
         self.screen.addstr(x, y+19, '球队', curses.color_pair(2))
         self.screen.addstr(x, y+25, '比赛信息', curses.color_pair(2))
 
-    def update(self, lines):
-        if not lines:
-            return
-        if self.cache_lines and self.cache_lines[0][0] >= lines[0][0]:
-            return
-        self.update_cache(lines)
+    def update(self, lines, home, away):
+        if lines:
+            if not self.cache_lines:
+                self.cache_lines = lines[:self.cache_size]
+            elif self.cache_lines[0][0] < lines[0][0]:
+                self.update_cache(lines)
 
         self.screen.erase()
-        self.draw_header()
-        x, y = 3, 2
+        self.draw_header(home, away)
+
+        x, y = 4, 2
+
+        if not self.cache_lines:
+            self.screen.addstr(x, 10, '未开赛', curses.color_pair(1))
+            self.screen.refresh()
+            return
+
         for sid, residual, scores, team, content in self.cache_lines:
             self.screen.move(x, y)
             self.screen.clrtoeol()
