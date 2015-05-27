@@ -3,9 +3,9 @@
 
 
 import time
-from board import Board
-from hupuapi import APIClient
-from controls import Controller
+from nba.board import Board
+from nba.hupuapi import APIClient
+from nba.controls import Controller
 
 
 def main():
