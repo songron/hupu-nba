@@ -19,17 +19,17 @@ Live scoreboard of NBA games running in the console. NBA 文字/比分直播,命
     git clone https://github.com/ghostrong/hupu-nba.git
     cd hupu-nba
     python run.py
-    
+
 * MENU:
-  
-  Press the *[number]* to enter the corresponding game.
-   
+
+  Type the *[number]* to enter the corresponding game.
+
 * LIVE:
 
-  Press *m* to go back to the menu.
-  
-  Press *f* to refresh manually.
-  
+  Type *m* to go back to the menu.
+
+  Type *f* to refresh manually.
+
   The console will refresh automatically every 5 seconds by default.
 
 
